@@ -24,7 +24,8 @@ export enum REPORT_STATUS {
   RESOLVED = 'resolved',
   CLOSED = 'closed',
   REJECTED = 'rejected',
-  VERIFICATION_NEEDED = 'verification_needed'
+  VERIFICATION_NEEDED = 'verification_needed',
+  ASSIGNED = "ASSIGNED"
 }
 
 // Priority Levels Enum
