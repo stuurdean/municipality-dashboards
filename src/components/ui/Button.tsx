@@ -23,11 +23,11 @@ const Button: React.FC<ButtonProps> = ({
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]';
 
   const variantClasses = {
-    primary: 'bg-municipal-primary text-white hover:bg-blue-700 focus:ring-municipal-primary shadow-lg hover:shadow-xl',
-    accent: 'bg-municipal-accent text-white hover:bg-amber-500 focus:ring-municipal-accent shadow-lg hover:shadow-xl',
-    secondary: 'bg-municipal-secondary text-white hover:bg-blue-500 focus:ring-municipal-secondary shadow-lg hover:shadow-xl',
-    danger: 'bg-municipal-error text-white hover:bg-red-500 focus:ring-municipal-error shadow-lg hover:shadow-xl',
-    success: 'bg-municipal-success text-white hover:bg-green-500 focus:ring-municipal-success shadow-lg hover:shadow-xl',
+    primary: 'bg-municipal-primary text-white focus:ring-municipal-primary shadow-lg hover:shadow-xl',
+    accent: 'bg-municipal-accent text-white  focus:ring-municipal-accent shadow-lg hover:shadow-xl',
+    secondary: 'bg-municipal-secondary text-white focus:ring-municipal-secondary shadow-lg hover:shadow-xl',
+    danger: 'bg-municipal-error text-white  focus:ring-municipal-error shadow-lg hover:shadow-xl',
+    success: 'bg-municipal-success text-white  focus:ring-municipal-success shadow-lg hover:shadow-xl',
     ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-300 border border-gray-300'
   };
 

@@ -297,7 +297,7 @@ const ReportDetailsClient: React.FC<ReportDetailsClientProps> = ({
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-municipal-primary to-municipal-secondary rounded-2xl p-6 text-white">
+      <div className="bg-municipal-secondary rounded-2xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Button
