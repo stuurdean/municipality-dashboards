@@ -651,33 +651,413 @@ const ReportDetailsClient: React.FC<ReportDetailsClientProps> = ({
             </div>
           )}
 
-          {/* Other tabs remain similar but with updated icons */}
-          {activeTab === "ai-analysis" && report.textAnalysis && (
+          {activeTab === "ai-analysis" && (
             <div className="space-y-6">
-              {/* Confidence Scores */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
-                  <h4 className="font-semibold text-blue-800 mb-3 flex items-center">
-                    <Bot className="h-5 w-5 mr-2" />
-                    AI Confidence
-                  </h4>
-                  <ConfidenceMeter score={report.aiConfidenceScore} label="" />
+              <h3 className="text-xl font-semibold flex items-center">
+                <Bot className="h-5 w-5 mr-2" />
+                AI Analysis
+              </h3>
+              
+              {report.textAnalysis ? (
+                <div className="space-y-6">
+                  {/* Confidence Scores */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
+                      <h4 className="font-semibold text-blue-800 mb-3 flex items-center">
+                        <Bot className="h-5 w-5 mr-2" />
+                        AI Confidence
+                      </h4>
+                      <ConfidenceMeter score={report.aiConfidenceScore || 0} label="" />
+                    </div>
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
+                      <h4 className="font-semibold text-green-800 mb-3 flex items-center">
+                        <TrendingUp className="h-5 w-5 mr-2" />
+                        ML Confidence
+                      </h4>
+                      <ConfidenceMeter score={report.mlConfidenceScore || 0} label="" />
+                    </div>
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6">
+                      <h4 className="font-semibold text-purple-800 mb-3 flex items-center">
+                        <FileText className="h-5 w-5 mr-2" />
+                        Text Analysis
+                      </h4>
+                      <ConfidenceMeter
+                        score={report.textAnalysis.confidence || 0}
+                        label=""
+                      />
+                    </div>
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6">
+                      <h4 className="font-semibold text-orange-800 mb-3 flex items-center">
+                        <MessageCircle className="h-5 w-5 mr-2" />
+                        Sentiment
+                      </h4>
+                      <div className="text-center">
+                        <div
+                          className={`text-2xl font-bold ${
+                            report.textAnalysis.sentiment?.label === "NEGATIVE"
+                              ? "text-red-600"
+                              : report.textAnalysis.sentiment?.label === "POSITIVE"
+                              ? "text-green-600"
+                              : "text-yellow-600"
+                          }`}
+                        >
+                          {report.textAnalysis.sentiment?.label || "NEUTRAL"}
+                        </div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          Score:{" "}
+                          {report.textAnalysis.sentiment?.score > 0 ? "+" : ""}
+                          {report.textAnalysis.sentiment?.score || 0}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ML Suggestions */}
+                  {report.mlSuggestions && report.mlSuggestions.length > 0 && (
+                    <div className="bg-white rounded-xl border p-6">
+                      <h3 className="text-xl font-semibold mb-4 flex items-center">
+                        <Lightbulb className="h-5 w-5 mr-2" />
+                        AI Suggestions
+                      </h3>
+                      <div className="space-y-3">
+                        {report.mlSuggestions.map((suggestion, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start space-x-4 p-4 bg-blue-50 rounded-lg"
+                          >
+                            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              <span className="text-blue-600 text-sm">AI</span>
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex justify-between items-start">
+                                <span className="font-semibold text-blue-900">
+                                  {suggestion.type?.replace("_", " ") || "Suggestion"}
+                                </span>
+                                <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                  {((suggestion.confidence || 0) * 100).toFixed(0)}%
+                                  confidence
+                                </span>
+                              </div>
+                              <p className="text-blue-800 mt-1">
+                                Change from <strong>{suggestion.current}</strong> to{" "}
+                                <strong>{suggestion.suggested}</strong>
+                              </p>
+                              <p className="text-sm text-blue-700 mt-2">
+                                {suggestion.reason}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Text Analysis Details */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="bg-white rounded-xl border p-6">
+                      <h3 className="text-xl font-semibold mb-4 flex items-center">
+                        <Search className="h-5 w-5 mr-2" />
+                        Keywords & Entities
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-medium text-gray-700 mb-2">
+                            Keywords
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {report.textAnalysis.keywords?.map((keyword, index) => (
+                              <span
+                                key={index}
+                                className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
+                              >
+                                {keyword}
+                              </span>
+                            )) || (
+                              <span className="text-gray-500 text-sm">No keywords extracted</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl border p-6">
+                      <h3 className="text-xl font-semibold mb-4 flex items-center">
+                        <Filter className="h-5 w-5 mr-2" />
+                        Category Analysis
+                      </h3>
+                      {report.textAnalysis.categorySuggestion ? (
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-700">
+                              Suggested Category
+                            </span>
+                            <IssueTypeBadge
+                              issueType={
+                                report.textAnalysis.categorySuggestion.label
+                              }
+                            />
+                          </div>
+                          <ConfidenceMeter
+                            score={
+                              report.textAnalysis.categorySuggestion.confidence
+                            }
+                            label="Category Confidence"
+                          />
+                        </div>
+                      ) : (
+                        <div className="text-center py-4 text-gray-500">
+                          <Filter className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                          <p>No category suggestions available</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
-                  <h4 className="font-semibold text-green-800 mb-3 flex items-center">
-                    <TrendingUp className="h-5 w-5 mr-2" />
-                    ML Confidence
-                  </h4>
-                  <ConfidenceMeter score={report.mlConfidenceScore} label="" />
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-xl">
+                  <Bot className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-gray-500 text-lg">No AI Analysis Available</p>
+                  <p className="text-gray-400">
+                    This report hasn't been processed by AI yet or analysis data is not available.
+                  </p>
                 </div>
-                {/* ... rest of AI analysis content with updated icons */}
-              </div>
+              )}
             </div>
           )}
 
-          {/* Add Comment Section */}
+          {activeTab === "image-analysis" && (
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold flex items-center">
+                <ImageIcon className="h-5 w-5 mr-2" />
+                Image Analysis
+              </h3>
+
+              {report.imageClassifications && report.imageClassifications.length > 0 ? (
+                <div className="space-y-6">
+                  {/* Summary Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4">
+                      <div className="text-2xl font-bold text-green-600">
+                        {report.imageClassifications.length}
+                      </div>
+                      <div className="text-sm text-green-700">
+                        Images Processed
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {Math.max(
+                          ...report.imageClassifications.map(
+                            (ic) => (ic.confidence || 0) * 100
+                          )
+                        ).toFixed(1)}
+                        %
+                      </div>
+                      <div className="text-sm text-blue-700">
+                        Highest Confidence
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+                      <div className="text-2xl font-bold text-purple-600">
+                        {report.imageClassifications[0]?.modelVersion || "N/A"}
+                      </div>
+                      <div className="text-sm text-purple-700">
+                        Model Version
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4">
+                      <div className="text-2xl font-bold text-orange-600">
+                        {(report.mlConfidenceScore || 0) * 100}%
+                      </div>
+                      <div className="text-sm text-orange-700">
+                        Overall ML Confidence
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Individual Image Classifications */}
+                  <div className="space-y-6">
+                    {report.imageClassifications.map(
+                      (classification, index) => (
+                        <div
+                          key={index}
+                          className="bg-white border rounded-xl p-6"
+                        >
+                          <div className="flex flex-col lg:flex-row gap-6">
+                            {/* Image Preview */}
+                            <div className="lg:w-1/3">
+                              <div className="bg-gray-100 rounded-lg aspect-video flex items-center justify-center">
+                                {report.imageURLs && report.imageURLs[index] ? (
+                                  <div className="text-center">
+                                    <ImageIcon className="h-12 w-12 mx-auto mb-2 text-gray-600" />
+                                    <p className="text-sm text-gray-600">
+                                      Image {index + 1}
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      {classification.imageURL}
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <div className="text-center text-gray-400">
+                                    <ImageIcon className="h-12 w-12 mx-auto mb-2" />
+                                    <p>Image not available</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Classification Details */}
+                            <div className="lg:w-2/3 space-y-4">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h4 className="font-semibold text-lg text-gray-900">
+                                    Image {(classification.imageIndex || index) + 1}
+                                  </h4>
+                                  <p className="text-sm text-gray-500">
+                                    Processed:{" "}
+                                    {classification.timestamp 
+                                      ? toDate(classification.timestamp).toLocaleString()
+                                      : "Unknown"
+                                    }
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-2xl font-bold text-blue-600">
+                                    {((classification.confidence || 0) * 100).toFixed(1)}%
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    Confidence
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Primary Prediction */}
+                              <div className="bg-blue-50 rounded-lg p-4">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="font-semibold text-blue-900">
+                                    Primary Classification
+                                  </span>
+                                  <IssueTypeBadge
+                                    issueType={classification.label || "unknown"}
+                                  />
+                                </div>
+                                <div className="w-full bg-blue-200 rounded-full h-3">
+                                  <div
+                                    className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+                                    style={{
+                                      width: `${(classification.confidence || 0) * 100}%`,
+                                    }}
+                                  ></div>
+                                </div>
+                                <div className="flex justify-between text-sm text-blue-700 mt-1">
+                                  <span>0%</span>
+                                  <span>
+                                    {((classification.confidence || 0) * 100).toFixed(1)}%
+                                  </span>
+                                  <span>100%</span>
+                                </div>
+                              </div>
+
+                              {/* All Predictions */}
+                              {classification.allPredictions && classification.allPredictions.length > 0 && (
+                                <div>
+                                  <h5 className="font-medium text-gray-700 mb-3">
+                                    All Predictions
+                                  </h5>
+                                  <div className="space-y-2">
+                                    {classification.allPredictions.map(
+                                      (prediction, predIndex) => (
+                                        <div
+                                          key={predIndex}
+                                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                        >
+                                          <div className="flex items-center space-x-3">
+                                            <IssueTypeBadge
+                                              issueType={prediction.label}
+                                            />
+                                            <span className="text-sm text-gray-600">
+                                              {prediction.label.replace("_", " ")}
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center space-x-3">
+                                            <div className="w-24 bg-gray-200 rounded-full h-2">
+                                              <div
+                                                className="bg-green-500 h-2 rounded-full"
+                                                style={{
+                                                  width: `${(prediction.confidence || 0) * 100}%`,
+                                                }}
+                                              ></div>
+                                            </div>
+                                            <span className="text-sm font-medium text-gray-700 w-12 text-right">
+                                              {((prediction.confidence || 0) * 100).toFixed(1)}%
+                                            </span>
+                                          </div>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-xl">
+                  <ImageIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-gray-500 text-lg">No Image Analysis Available</p>
+                  <p className="text-gray-400">
+                    No image classifications have been processed for this report.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "media" && (
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold flex items-center">
+                <ImageIcon className="h-5 w-5 mr-2" />
+                Report Media
+              </h3>
+              {report.imageURLs && report.imageURLs.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {report.imageURLs.map((url, index) => (
+                    <div
+                      key={index}
+                      className="bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="aspect-video bg-gray-200 flex items-center justify-center">
+                        <div className="text-center">
+                          <ImageIcon className="h-12 w-12 mx-auto mb-2 text-gray-600" />
+                          <p className="text-sm text-gray-600">
+                            Image {index + 1}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <p className="text-sm text-gray-600 truncate">{url}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <ImageIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-gray-500 text-lg">
+                    No images attached to this report
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {activeTab === "comments" && (
             <div className="space-y-6">
+              {/* Add Comment Section */}
               <div className="bg-white rounded-xl border p-6">
                 <h3 className="text-xl font-semibold mb-4 flex items-center">
                   <MessageCircle className="h-5 w-5 mr-2" />

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { FaSignInAlt, FaBuilding } from 'react-icons/fa';
+import Image from 'next/image';
 
 export const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -35,8 +36,14 @@ export const LoginForm: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <div className="text-center">
-            <div className="mx-auto h-16 w-16 bg-municipal-primary rounded-xl flex items-center justify-center shadow-lg">
-              <FaBuilding className="h-8 w-8 text-white" />
+            <div className="mx-auto rounded-xl flex items-center justify-center ">
+                 <Image
+            className="dark:invert"
+            src="/logo.png"
+            alt="Municipality logo"
+            width={150}
+            height={70}
+          />
             </div>
             <h2 className="mt-6 text-3xl font-bold text-gray-900">
               Municipality Dashboard
