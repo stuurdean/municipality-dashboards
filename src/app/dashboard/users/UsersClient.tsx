@@ -5,10 +5,19 @@ import { User, UserType, UserStats } from '@/types/user';
 import { userService } from '@/services/userService';
 import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
-import UserStatsCard from '@/components/dashboard/UserStatsCard';
 import UserModal from '@/components/users/UserModal';
 import { authService } from '@/services/authService';
-
+import { 
+  Users, 
+  UserCheck, 
+  UserCog, 
+  UserPlus, 
+  RefreshCw,
+  Search,
+  Filter,
+  Download
+} from 'lucide-react';
+import Input from '@/components/ui/Input';
 
 const UsersClient: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -87,28 +96,25 @@ const UsersClient: React.FC = () => {
   };
 
   const handleSaveUser = async (userData: any) => {
-  try {
-    if (editingUser) {
-      // Update existing user (no password)
-      await userService.updateUser(editingUser.id, userData);
-      alert('✅ User updated successfully!');
-    } else {
-      // Create new user with email/password
-      await authService.registerUser(userData);
-      alert('✅ User created successfully! They can now login with their email and password.');
+    try {
+      if (editingUser) {
+        // Update existing user (no password)
+        await userService.updateUser(editingUser.id, userData);
+        alert('✅ User updated successfully!');
+      } else {
+        // Create new user with email/password
+        await authService.registerUser(userData);
+        alert('✅ User created successfully! They can now login with their email and password.');
+      }
       
-      // Optional: Send welcome email
-      // await authService.sendWelcomeEmail(userData.email, userData.fullName);
+      setIsModalOpen(false);
+      setEditingUser(null);
+      await loadUsers(); // Reload users
+    } catch (error: any) {
+      console.error('Error saving user:', error);
+      alert(`❌ ${error.message || 'Failed to save user. Please try again.'}`);
     }
-    
-    setIsModalOpen(false);
-    setEditingUser(null);
-    await loadUsers(); // Reload users
-  } catch (error: any) {
-    console.error('Error saving user:', error);
-    alert(`❌ ${error.message || 'Failed to save user. Please try again.'}`);
-  }
-};
+  };
 
   const handleToggleActive = async (user: User) => {
     if (!confirm(`Are you sure you want to ${user.isActive ? 'deactivate' : 'activate'} ${user.fullName}?`)) {
@@ -231,9 +237,14 @@ const UsersClient: React.FC = () => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-            <p className="text-gray-600">Manage municipality users and permissions</p>
+          <div className="flex items-center space-x-4">
+            <div className="p-2 bg-blue-100 rounded-xl">
+              <Users className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+              <p className="text-gray-600">Manage municipality users and permissions</p>
+            </div>
           </div>
         </div>
         
@@ -260,36 +271,96 @@ const UsersClient: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600">Manage municipality users and permissions</p>
+        <div className="flex items-center space-x-4">
+          <div className="p-2 bg-blue-100 rounded-xl">
+            <Users className="h-6 w-6 text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+            <p className="text-gray-600">
+              {loading ? 'Loading users...' : `Managing ${users.length} users`}
+            </p>
+          </div>
         </div>
-        <Button variant="primary" onClick={handleCreateUser}>
-          👤 Add New User
-        </Button>
+        <div className="flex space-x-3">
+          <Button variant="secondary" disabled={loading}>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+          <Button variant="primary" onClick={handleCreateUser} disabled={loading}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            Add User
+          </Button>
+          <Button 
+            variant="secondary" 
+            onClick={loadUsers}
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
-      {/* Statistics */}
-      {stats && <UserStatsCard stats={stats} />}
+      {/* Statistics - Enhanced Style */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+                <div className="text-sm text-gray-600">Total Users</div>
+              </div>
+              <Users className="h-8 w-8 text-blue-600" />
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-purple-600">{stats.byType.ADMIN}</div>
+                <div className="text-sm text-gray-600">Administrators</div>
+              </div>
+              <UserCog className="h-8 w-8 text-purple-600" />
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+                <div className="text-sm text-gray-600">Active Users</div>
+              </div>
+              <UserCheck className="h-8 w-8 text-green-600" />
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-orange-600">{stats.byType.EMPLOYEE}</div>
+                <div className="text-sm text-gray-600">Employees</div>
+              </div>
+              <UserCheck className="h-8 w-8 text-orange-600" />
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
+      {/* Filters - Enhanced Style */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              🔍 Search Users
-            </label>
-            <input
+          <div className="md:col-span-2">
+            <Input
+              label="Search Users"
               type="text"
-              placeholder="Search by name, email, or department..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Search by name, email, department, or phone..."
+              icon="search"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              👥 Filter by Role
+            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <Filter className="h-4 w-4 mr-2 text-gray-500" />
+              Filter by Role
             </label>
             <select
               value={filterType}
@@ -303,8 +374,9 @@ const UsersClient: React.FC = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              📊 Filter by Status
+            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <Filter className="h-4 w-4 mr-2 text-gray-500" />
+              Filter by Status
             </label>
             <select
               value={filterStatus}
@@ -316,16 +388,6 @@ const UsersClient: React.FC = () => {
               <option value="INACTIVE">Inactive</option>
             </select>
           </div>
-          <div className="flex items-end">
-            <Button
-              variant="secondary"
-              onClick={loadUsers}
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? '🔄 Refreshing...' : '🔄 Refresh'}
-            </Button>
-          </div>
         </div>
       </div>
 
@@ -336,9 +398,14 @@ const UsersClient: React.FC = () => {
         keyField="id"
         onEdit={handleEditUser}
         onDelete={handleDeleteUser}
-    
         isLoading={loading}
-        emptyMessage={loading ? "Loading users..." : "No users found matching your criteria"}
+        emptyMessage={
+          loading 
+            ? "Loading users..." 
+            : users.length === 0 
+              ? "No users found in the system."
+              : "No users match your current filters."
+        }
       />
 
       {/* User Modal */}

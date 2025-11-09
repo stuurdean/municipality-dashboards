@@ -1,59 +1,53 @@
+// components/dashboard/StatsCard.tsx
 import React from 'react';
-import { FaUsers, FaFileAlt, FaDollarSign, FaHardHat } from 'react-icons/fa';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 interface StatsCardProps {
   title: string;
-  value: string;
-  change: number;
-  description: string;
+  value: string | number;
+  change?: number;
+  description?: string;
   icon: 'users' | 'files' | 'revenue' | 'projects';
 }
 
-export const StatsCard: React.FC<StatsCardProps> = ({
-  title,
-  value,
-  change,
-  description,
-  icon,
-}) => {
-  const isPositive = change >= 0;
+const iconMap = {
+  users: '👥',
+  files: '📋',
+  revenue: '💰',
+  projects: '🚧'
+};
 
-  const iconMap = {
-    users: <FaUsers className="h-6 w-6 text-white" />,
-    files: <FaFileAlt className="h-6 w-6 text-white" />,
-    revenue: <FaDollarSign className="h-6 w-6 text-white" />,
-    projects: <FaHardHat className="h-6 w-6 text-white" />,
-  };
+export const StatsCard: React.FC<StatsCardProps> = ({ 
+  title, 
+  value, 
+  change, 
+  description, 
+  icon 
+}) => {
+  const isPositive = change && change >= 0;
 
   return (
-    <div className="bg-white overflow-hidden shadow rounded-lg">
-      <div className="p-5">
-        <div className="flex items-center">
-          <div className="flex-shrink-0">
-            <div className="h-12 w-12 bg-municipal-primary rounded-lg flex items-center justify-center">
-              {iconMap[icon]}
-            </div>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
+          <div className="flex items-baseline space-x-2">
+            <p className="text-2xl font-bold text-gray-900">{value}</p>
+            {change !== undefined && (
+              <div className={`flex items-center text-sm font-medium ${
+                isPositive ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {isPositive ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+                <span>{Math.abs(change)}%</span>
+              </div>
+            )}
           </div>
-          <div className="ml-5 w-0 flex-1">
-            <dl>
-              <dt className="text-sm font-medium text-gray-500 truncate">
-                {title}
-              </dt>
-              <dd>
-                <div className="text-lg font-medium text-gray-900">
-                  {value}
-                </div>
-              </dd>
-            </dl>
-          </div>
+          {description && (
+            <p className="text-xs text-gray-500 mt-2">{description}</p>
+          )}
         </div>
-      </div>
-      <div className="bg-gray-50 px-5 py-3">
-        <div className="text-sm">
-          <span className={isPositive ? 'text-green-600' : 'text-red-600'}>
-            {isPositive ? '+' : ''}{change}%
-          </span>
-          <span className="text-gray-500"> {description}</span>
+        <div className="flex-shrink-0 text-2xl">
+          {iconMap[icon]}
         </div>
       </div>
     </div>
