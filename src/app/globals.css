@@ -3,6 +3,14 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Municipal Color Scheme */
+  --municipal-primary: #fbbf24;
+  --municipal-secondary: #34d399;
+  --municipal-accent: #f59e0b;
+  --municipal-success: #10b981;
+  --municipal-warning: #f59e0b;
+  --municipal-error: #ef4444;
 }
 
 @theme inline {
@@ -10,12 +18,28 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Municipal Colors */
+  --color-municipal-primary: var(--municipal-primary);
+  --color-municipal-secondary: var(--municipal-secondary);
+  --color-municipal-accent: var(--municipal-accent);
+  --color-municipal-success: var(--municipal-success);
+  --color-municipal-warning: var(--municipal-warning);
+  --color-municipal-error: var(--municipal-error);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    
+    /* Dark mode adjustments for municipal colors */
+    --municipal-primary: #fbbf24;
+    --municipal-secondary: #34d399;
+    --municipal-accent: #fbbf24;
+    --municipal-success: #34d399;
+    --municipal-warning: #fbbf24;
+    --municipal-error: #f87171;
   }
 }
 
