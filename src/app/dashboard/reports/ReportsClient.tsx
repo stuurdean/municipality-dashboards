@@ -7,6 +7,16 @@ import DataTable from '@/components/ui/DataTable';
 import Button from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { reportService } from '@/services/reportService';
+import { 
+  ClipboardList, 
+  Clock, 
+  CheckCircle, 
+  AlertCircle,
+  AlertTriangle,
+  RefreshCw,
+  Download,
+  Plus
+} from 'lucide-react';
 
 interface ReportsClientProps {
   user: User;
@@ -57,6 +67,34 @@ const ReportsClient: React.FC<ReportsClientProps> = ({ user }) => {
       // Implement delete functionality
       setReports(prev => prev.filter(r => r.id !== report.id));
     }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const reportsData = await reportService.getAllReports();
+      setReports(reportsData);
+    } catch (err) {
+      console.error('❌ Failed to refresh reports:', err);
+      setError('Failed to refresh reports. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Calculate statistics
+  const stats = {
+    total: reports.length,
+    inProgress: reports.filter(r => r.status === 'in_progress' || r.status === 'ASSIGNED').length,
+    critical: reports.filter(r => r.priority === 'critical').length,
+    resolved: reports.filter(r => r.status === 'resolved' || r.status === 'closed').length,
+    pending: reports.filter(r => 
+      r.status === 'submitted' || 
+      r.status === 'ai_processed' || 
+      r.status === 'under_review' ||
+      r.status === 'verification_needed'
+    ).length
   };
 
   const columns = [
@@ -142,9 +180,14 @@ const ReportsClient: React.FC<ReportsClientProps> = ({ user }) => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Service Reports</h1>
-            <p className="text-gray-600">Manage and review all service requests</p>
+          <div className="flex items-center space-x-4">
+            <div className="p-2 bg-blue-100 rounded-xl">
+              <ClipboardList className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Service Reports</h1>
+              <p className="text-gray-600">Manage and review all service requests</p>
+            </div>
           </div>
         </div>
         
@@ -155,7 +198,7 @@ const ReportsClient: React.FC<ReportsClientProps> = ({ user }) => {
               <h3 className="text-red-800 font-semibold">Error Loading Reports</h3>
               <p className="text-red-700">{error}</p>
               <button 
-                onClick={() => window.location.reload()}
+                onClick={handleRefresh}
                 className="mt-2 text-red-600 hover:text-red-800 underline"
               >
                 Try Again
@@ -169,47 +212,79 @@ const ReportsClient: React.FC<ReportsClientProps> = ({ user }) => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Service Reports</h1>
-          <p className="text-gray-600">
-            {loading ? 'Loading reports...' : `Showing ${reports.length} reports`}
-          </p>
+        <div className="flex items-center space-x-4">
+          <div className="p-2 bg-blue-100 rounded-xl">
+            <ClipboardList className="h-6 w-6 text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Service Reports</h1>
+            <p className="text-gray-600">
+              {loading ? 'Loading reports...' : `Showing ${reports.length} reports`}
+            </p>
+          </div>
         </div>
         <div className="flex space-x-3">
-          <Button variant="secondary" disabled={loading}>
-            Export
-          </Button>
-          <Button variant="primary" disabled={loading}>
-            + New Report
+
+          <Button 
+            variant="secondary" 
+            onClick={handleRefresh}
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
           </Button>
         </div>
       </div>
 
-      {/* Stats Summary */}
+      {/* Stats Summary - Updated Style */}
       {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow border">
-            <div className="text-2xl font-bold text-blue-600">{reports.length}</div>
-            <div className="text-sm text-gray-600">Total Reports</div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow border">
-            <div className="text-2xl font-bold text-orange-600">
-              {reports.filter(r => r.status === 'in_progress').length}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+                <div className="text-sm text-gray-600">Total Reports</div>
+              </div>
+              <ClipboardList className="h-8 w-8 text-blue-600" />
             </div>
-            <div className="text-sm text-gray-600">In Progress</div>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow border">
-            <div className="text-2xl font-bold text-red-600">
-              {reports.filter(r => r.priority === 'critical').length}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-orange-600">{stats.inProgress}</div>
+                <div className="text-sm text-gray-600">In Progress</div>
+              </div>
+              <Clock className="h-8 w-8 text-orange-600" />
             </div>
-            <div className="text-sm text-gray-600">Critical</div>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow border">
-            <div className="text-2xl font-bold text-green-600">
-              {reports.filter(r => r.status === 'resolved').length}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-red-600">{stats.critical}</div>
+                <div className="text-sm text-gray-600">Critical Priority</div>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-red-600" />
             </div>
-            <div className="text-sm text-gray-600">Resolved</div>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
+                <div className="text-sm text-gray-600">Resolved</div>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+                <div className="text-sm text-gray-600">Pending Review</div>
+              </div>
+              <AlertCircle className="h-8 w-8 text-yellow-600" />
+            </div>
           </div>
         </div>
       )}

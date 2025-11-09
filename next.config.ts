@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+
+  
   /* config options here */
   reactCompiler: true,
     images: {
@@ -14,6 +16,7 @@ const nextConfig: NextConfig = {
     FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID,
     FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
   },
+ 
 
 };
 
