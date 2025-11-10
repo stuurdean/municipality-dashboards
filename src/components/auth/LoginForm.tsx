@@ -1,31 +1,31 @@
-'use client';
-import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
-import { FaSignInAlt, FaBuilding } from 'react-icons/fa';
-import Image from 'next/image';
+"use client";
+import React, { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { FaSignInAlt, FaBuilding } from "react-icons/fa";
+import Image from "next/image";
 
 export const LoginForm: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  
+  const [error, setError] = useState("");
+
   const { login } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       await login(email, password);
-      router.push('/dashboard');
+      router.push("/dashboard");
     } catch (error: any) {
-      setError(error.message || 'Failed to login');
+      setError(error.message || "Failed to login");
     } finally {
       setLoading(false);
     }
@@ -37,29 +37,29 @@ export const LoginForm: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <div className="text-center">
             <div className="mx-auto rounded-xl flex items-center justify-center ">
-                 <Image
-            className="dark:invert"
-            src="/logo.png"
-            alt="Municipality logo"
-            width={150}
-            height={70}
-          />
+              <Image
+              className="mx-auto mb-4 bg-white"
+                src="/plk.jpg"
+                alt="Municipality logo"
+                width={200}
+                height={80}
+              />
             </div>
-            <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            <h2 className="mt-6 text-3xl font-bold text-municipal-secondary">
               Municipality Dashboard
             </h2>
             <p className="mt-2 text-sm text-gray-600">
               Sign in to your account
             </p>
           </div>
-          
+
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-xl bg-red-50 p-4 border border-red-200">
                 <div className="text-sm text-red-700 font-medium">{error}</div>
               </div>
             )}
-            
+
             <div className="space-y-5">
               <Input
                 label="Email address"
@@ -70,7 +70,7 @@ export const LoginForm: React.FC = () => {
                 placeholder="Enter your email"
                 icon="email"
               />
-              
+
               <Input
                 label="Password"
                 type="password"
@@ -90,13 +90,19 @@ export const LoginForm: React.FC = () => {
                   type="checkbox"
                   className="h-4 w-4 text-municipal-primary focus:ring-municipal-primary border-gray-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                <label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-sm text-gray-900"
+                >
                   Remember me
                 </label>
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-municipal-primary hover:text-blue-700 transition-colors">
+                <a
+                  href="#"
+                  className="font-medium text-municipal-primary hover:text-blue-700 transition-colors"
+                >
                   Forgot your password?
                 </a>
               </div>

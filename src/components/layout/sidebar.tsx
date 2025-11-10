@@ -65,10 +65,10 @@ export const Sidebar: React.FC = () => {
     <div className="w-64 bg-white text-gray-700">
       <div className="flex flex-col h-full">
               <Image
-            className="dark:invert"
-            src="/logo.png"
+            className="mx-auto my-4 bg-white d"
+            src="/plk.jpg"
             alt="Municipality logo"
-            width={100}
+            width={200}
             height={70}
           />
         <div className="flex items-center justify-center h-16 shrink-0 px-4 ">
@@ -76,7 +76,7 @@ export const Sidebar: React.FC = () => {
           <br />
           <span className="text-xl font-bold">Municipality</span>
           {user && (
-            <span className="ml-2 text-xs bg-blue-500 px-2 py-1 rounded capitalize">
+            <span className="ml-2 text-xs bg-municipal-secondary px-2 py-1 rounded capitalize">
               {user.userType.toLowerCase()}
             </span>
           )}
