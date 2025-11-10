@@ -2,15 +2,21 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { usePathname } from 'next/navigation';
 import Button from '@/components/ui/Button';
+import { useState } from 'react';
 import { 
   LogOut, 
   User, 
   Home,
   Bell,
+  Menu,
+  X
 } from 'lucide-react';
-import { useState } from 'react';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -29,9 +35,9 @@ export const Header: React.FC = () => {
       return path.split('/').length > 3 ? 'Report Details' : 'Service Reports';
     }
     if (path.startsWith('/dashboard/users')) return 'User Management';
-    if (path.startsWith('/dashboard/analytics')) return 'Analytics';
-    if (path.startsWith('/dashboard/assignments')) return 'My Assignments';
-    if (path.startsWith('/dashboard/settings')) return 'Settings';
+    if (path.startsWith('/analytics')) return 'Analytics';
+    if (path.startsWith('/assignments')) return 'My Assignments';
+    if (path.startsWith('/settings')) return 'Settings';
     
     return 'Municipality Dashboard';
   };
@@ -58,11 +64,19 @@ export const Header: React.FC = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Left Section - Logo and Page Title */}
+          {/* Left Section - Mobile Menu and Page Title */}
           <div className="flex items-center space-x-4">
+            {/* Mobile menu button */}
+            <button
+              onClick={onMenuClick}
+              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-700 rounded-lg flex items-center justify-center">
                 <Home className="h-5 w-5 text-white" />
@@ -183,10 +197,20 @@ export const Header: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 hidden sm:flex"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="hidden sm:block">Logout</span>
+              </Button>
+
+              {/* Mobile Logout Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="flex items-center sm:hidden"
+              >
+                <LogOut className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -196,7 +220,7 @@ export const Header: React.FC = () => {
       {/* Overlay to close notifications when clicking outside */}
       {showNotifications && (
         <div 
-          className="fixed inset-0 z-30" 
+          className="fixed inset-0 z-40" 
           onClick={() => setShowNotifications(false)}
         />
       )}
